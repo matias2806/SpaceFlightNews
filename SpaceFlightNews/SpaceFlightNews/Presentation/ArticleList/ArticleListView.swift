@@ -1,16 +1,13 @@
 // Presentation/ArticleList/ArticleListView.swift
 // Main screen: search bar + paginated list.
-// State-driven: renders based on viewModel.state, no local async logic.
+// .searchable is attached to the List (not to the NavigationStack root)
+// so it does NOT propagate to pushed views (ArticleDetailView).
 
 import SwiftUI
 
 struct ArticleListView: View {
 
-    // With @Observable, SwiftUI tracks property accesses automatically.
-    // No @StateObject/@ObservedObject needed — plain var is sufficient.
     var viewModel: ArticleListViewModel
-    /// Factory injected from AppDependencies — keeps ArticleListView
-    /// ignorant of how ArticleDetailViewModel is constructed.
     var makeDetailViewModel: (Article) -> ArticleDetailViewModel
     @State private var searchText = ""
 
@@ -18,10 +15,6 @@ struct ArticleListView: View {
         NavigationStack {
             stateContent
                 .navigationTitle("Space News")
-                .searchable(text: $searchText, prompt: "Buscar artículos")
-                .onChange(of: searchText) { _, query in
-                    viewModel.search(query)
-                }
         }
         .onAppear {
             viewModel.onAppear()
@@ -60,7 +53,7 @@ struct ArticleListView: View {
                 }
             }
 
-            if case .success = viewModel.state, viewModel.currentTask != nil {
+            if canLoadMore {
                 HStack {
                     Spacer()
                     ProgressView()
@@ -73,6 +66,19 @@ struct ArticleListView: View {
         .navigationDestination(for: Article.self) { article in
             ArticleDetailView(viewModel: makeDetailViewModel(article))
         }
+        // .searchable on the List — scoped to this view only,
+        // does not appear on ArticleDetailView when pushed.
+        .searchable(text: $searchText, prompt: "Buscar por título")
+        .onChange(of: searchText) { _, query in
+            viewModel.search(query)
+        }
+    }
+
+    // MARK: - Helpers
+
+    private var canLoadMore: Bool {
+        guard case .success = viewModel.state else { return false }
+        return viewModel.currentTask != nil
     }
 
     // MARK: - Empty state
@@ -84,10 +90,12 @@ struct ArticleListView: View {
                 .foregroundStyle(.secondary)
             Text("Sin resultados")
                 .font(.headline)
-            Text("Probá con otro término de búsqueda.")
+            Text("No se encontraron artículos con ese título.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
         }
+        .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
