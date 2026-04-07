@@ -31,7 +31,10 @@ enum ArticleMapper {
     /// Maps a single DTO to its domain model.
     /// Throws `AppError.mappingFailed` if the article URL is invalid.
     static func toDomain(_ dto: ArticleDTO) throws -> Article {
-        guard let articleURL = URL(string: dto.url) else {
+        // Modern Foundation percent-encodes strings rather than returning nil,
+        // so "bad url" → "bad%20url" (no scheme). Require http/https explicitly.
+        guard let articleURL = URL(string: dto.url),
+              articleURL.scheme == "http" || articleURL.scheme == "https" else {
             throw AppError.mappingFailed("Invalid article URL: \(dto.url)")
         }
 
@@ -39,7 +42,14 @@ enum ArticleMapper {
             id: dto.id,
             title: dto.title,
             articleURL: articleURL,
-            imageURL: dto.imageUrl.flatMap(URL.init),
+            imageURL: dto.imageUrl.flatMap { str in
+                // Require an explicit http/https scheme — "not a url" gets
+                // percent-encoded by modern Foundation and would pass URL(string:),
+                // but has no scheme and is useless as an image source.
+                guard let url = URL(string: str),
+                      url.scheme == "http" || url.scheme == "https" else { return nil }
+                return url
+            },
             newsSite: dto.newsSite,
             summary: dto.summary,
             publishedAt: parseDate(dto.publishedAt)

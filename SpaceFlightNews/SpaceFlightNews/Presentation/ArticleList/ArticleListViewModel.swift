@@ -15,40 +15,45 @@ import Observation
 @Observable
 @MainActor
 final class ArticleListViewModel {
-
+    
     // MARK: - Observable state
-
+    
     private(set) var state: ViewState<[Article]> = .idle
     private(set) var isLoadingNextPage = false
     private(set) var hasNextPage = false
-
+    
     // MARK: - Internal (test access)
-
-    private(set) var currentTask: Task<Void, Never>?
-
+    
+    // Cambiar la declaración de currentTask
+    nonisolated(unsafe) private(set) var currentTask: Task<Void, Never>?
+    
     // MARK: - Private
-
+    
     private let fetchArticlesUseCase: any FetchArticlesUseCaseProtocol
-
+    
     private var allArticles: [Article] = []
     private var nextPageURL: String?       // API cursor — nil means last page
     private(set) var searchQuery = ""      // internal for tests
-
+    
     private let pageSize = 20
-
+    
     // MARK: - Init
-
+    
     init(fetchArticlesUseCase: some FetchArticlesUseCaseProtocol) {
         self.fetchArticlesUseCase = fetchArticlesUseCase
     }
-
+    
+    deinit {
+        currentTask?.cancel()
+    }
+    
     // MARK: - Public interface
-
+    
     func onAppear() {
         guard case .idle = state else { return }
         scheduleFirstPage()
     }
-
+    
     /// Client-side title filter — instant, no network call.
     func search(_ query: String) {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
@@ -56,7 +61,7 @@ final class ArticleListViewModel {
         searchQuery = trimmed
         applyFilter()
     }
-
+    
     /// Triggers next page when the last visible article appears.
     func loadNextPageIfNeeded(currentArticle: Article) {
         guard searchQuery.isEmpty,          // client-side filter: no more pages needed
@@ -66,7 +71,7 @@ final class ArticleListViewModel {
               articles.last?.id == currentArticle.id else { return }
         scheduleNextPage()
     }
-
+    
     func retry() {
         allArticles = []
         nextPageURL = nil
@@ -75,19 +80,24 @@ final class ArticleListViewModel {
         state = .idle
         scheduleFirstPage()
     }
-
+    
     // MARK: - Private
-
+    
     private func scheduleFirstPage() {
         currentTask?.cancel()
-        currentTask = Task { await fetchPage(nextPageURL: nil) }
+        currentTask = Task { [weak self] in
+            await self?.fetchPage(nextPageURL: nil)
+        }
     }
-
+    
     private func scheduleNextPage() {
         currentTask?.cancel()
-        currentTask = Task { await fetchPage(nextPageURL: nextPageURL) }
+        let cursor = nextPageURL        // capture URL at schedule time
+        currentTask = Task { [weak self] in
+            await self?.fetchPage(nextPageURL: cursor)
+        }
     }
-
+    
     private func applyFilter() {
         if searchQuery.isEmpty {
             state = allArticles.isEmpty ? .idle : .success(allArticles)
@@ -106,13 +116,13 @@ final class ArticleListViewModel {
         isLoadingNextPage = true
         defer {
             isLoadingNextPage = false
-            currentTask = nil     // reset so next trigger can fire
+            currentTask = nil
         }
 
         do {
             let result = try await fetchArticlesUseCase.execute(
                 nextPageURL: cursorURL,
-                search: nil,        // search is client-side
+                search: nil,
                 limit: pageSize
             )
 
@@ -122,7 +132,9 @@ final class ArticleListViewModel {
             nextPageURL = result.nextPageURL
             hasNextPage = result.nextPageURL != nil
             applyFilter()
-
+            
+            if allArticles.isEmpty { state = .empty }
+            
         } catch let error as AppError {
             guard !Task.isCancelled else { return }
             AppLogger.uiError(error, context: "ArticleListViewModel")
