@@ -6,7 +6,9 @@ import SwiftUI
 
 struct ArticleListView: View {
 
-    @StateObject var viewModel: ArticleListViewModel
+    // With @Observable, SwiftUI tracks property accesses automatically.
+    // No @StateObject/@ObservedObject needed — plain var is sufficient.
+    var viewModel: ArticleListViewModel
     @State private var searchText = ""
 
     var body: some View {

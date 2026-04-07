@@ -6,7 +6,11 @@
 import Foundation
 
 /// Single article as returned by /v4/articles/{id} and inside /v4/articles results.
-struct ArticleDTO: Decodable, Sendable {
+// Sendable conformance is implicit (struct with all-Sendable members).
+// Explicit Sendable causes a compiler error with SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor
+// because the synthesized Decodable init becomes @MainActor-isolated and can't satisfy
+// a Sendable type-parameter constraint.
+struct ArticleDTO: Decodable {
     let id: Int
     let title: String
     let url: String
@@ -26,7 +30,7 @@ struct ArticleDTO: Decodable, Sendable {
 }
 
 /// Paginated list response wrapper from /v4/articles.
-struct ArticleListDTO: Decodable, Sendable {
+struct ArticleListDTO: Decodable {
     let count: Int
     let next: String?
     let previous: String?

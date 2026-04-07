@@ -2,11 +2,13 @@
 // TODO: full implementation in feat: article detail screen commit.
 
 import Foundation
+import Observation
 
+@Observable
 @MainActor
-final class ArticleDetailViewModel: ObservableObject {
+final class ArticleDetailViewModel {
 
-    @Published private(set) var article: Article
+    private(set) var article: Article
 
     private let fetchArticleDetailUseCase: any FetchArticleDetailUseCaseProtocol
 

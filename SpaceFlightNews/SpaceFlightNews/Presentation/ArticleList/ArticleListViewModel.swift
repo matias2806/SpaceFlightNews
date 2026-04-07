@@ -1,18 +1,22 @@
 // Presentation/ArticleList/ArticleListViewModel.swift
-// Owns the article list state. Handles search debounce + pagination.
+// Uses @Observable (Swift 5.9+) instead of ObservableObject.
+// ObservableObject conflicts with SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor in Xcode 26:
+// objectWillChange needs to be non-isolated but the class is @MainActor-bound.
 //
 // currentTask is internal (not private) so unit tests can
 // `await viewModel.currentTask?.value` for deterministic assertions
 // instead of using fragile Task.yield() or arbitrary sleeps.
 
 import Foundation
+import Observation
 
+@Observable
 @MainActor
-final class ArticleListViewModel: ObservableObject {
+final class ArticleListViewModel {
 
-    // MARK: - Published state
+    // MARK: - Observable state
 
-    @Published private(set) var state: ViewState<[Article]> = .idle
+    private(set) var state: ViewState<[Article]> = .idle
 
     // MARK: - Internal (test access)
 
@@ -63,7 +67,7 @@ final class ArticleListViewModel: ObservableObject {
         guard canLoadMore,
               case .success(let articles) = state,
               articles.last?.id == currentArticle.id,
-              currentTask?.isCancelled != false else { return }
+              currentTask == nil || currentTask?.isCancelled == true else { return }
         scheduleLoad()
     }
 

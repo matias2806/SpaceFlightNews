@@ -4,7 +4,8 @@
 
 import Foundation
 
-struct Article: Identifiable, Equatable, Sendable {
+// Hashable required for NavigationStack's navigationDestination(for: Article.self).
+struct Article: Identifiable, Hashable, Sendable {
     let id: Int
     let title: String
     let articleURL: URL

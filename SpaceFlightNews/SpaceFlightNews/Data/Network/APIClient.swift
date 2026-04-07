@@ -7,7 +7,10 @@ import Foundation
 // MARK: - Protocol
 
 protocol APIClientProtocol: Sendable {
-    func fetch<T: Decodable & Sendable>(_ endpoint: APIEndpoint) async throws -> T
+    // No `& Sendable` constraint: DTOs have a @MainActor-isolated Decodable
+    // conformance (due to SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor) which
+    // is incompatible with a Sendable type-parameter constraint.
+    func fetch<T: Decodable>(_ endpoint: APIEndpoint) async throws -> T
 }
 
 // MARK: - Implementation
@@ -22,7 +25,7 @@ final class URLSessionAPIClient: APIClientProtocol {
         self.decoder = JSONDecoder()
     }
 
-    func fetch<T: Decodable & Sendable>(_ endpoint: APIEndpoint) async throws -> T {
+    func fetch<T: Decodable>(_ endpoint: APIEndpoint) async throws -> T {
         let request: URLRequest
         do {
             request = try endpoint.urlRequest()
