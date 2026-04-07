@@ -9,6 +9,9 @@ struct ArticleListView: View {
     // With @Observable, SwiftUI tracks property accesses automatically.
     // No @StateObject/@ObservedObject needed — plain var is sufficient.
     var viewModel: ArticleListViewModel
+    /// Factory injected from AppDependencies — keeps ArticleListView
+    /// ignorant of how ArticleDetailViewModel is constructed.
+    var makeDetailViewModel: (Article) -> ArticleDetailViewModel
     @State private var searchText = ""
 
     var body: some View {
@@ -68,7 +71,7 @@ struct ArticleListView: View {
         }
         .listStyle(.plain)
         .navigationDestination(for: Article.self) { article in
-            ArticleDetailView(article: article)
+            ArticleDetailView(viewModel: makeDetailViewModel(article))
         }
     }
 

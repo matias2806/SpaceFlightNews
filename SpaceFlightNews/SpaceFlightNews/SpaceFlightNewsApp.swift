@@ -10,7 +10,10 @@ struct SpaceFlightNewsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ArticleListView(viewModel: dependencies.articleListViewModel)
+            ArticleListView(
+                viewModel: dependencies.articleListViewModel,
+                makeDetailViewModel: dependencies.makeDetailViewModel
+            )
         }
     }
 }
