@@ -1,17 +1,15 @@
 // Domain/Repositories/ArticleRepository.swift
-// Protocol only. Domain owns the contract; Data provides the implementation.
-// This boundary enables swapping implementations (e.g. cache, mock) without
-// touching Domain or Presentation.
+// Protocol only. Domain defines the contract; Data provides the implementation.
 
 import Foundation
 
 protocol ArticleRepository: Sendable {
-    /// Fetch a page of articles, optionally filtered by search query.
-    /// - Parameters:
-    ///   - search: Optional full-text search string.
-    ///   - limit: Number of items to fetch.
-    ///   - offset: Pagination offset.
-    func fetchArticles(search: String?, limit: Int, offset: Int) async throws -> [Article]
+    /// First page or search reset — always starts from offset 0.
+    func fetchArticles(search: String?, limit: Int) async throws -> ArticlePageResult
+
+    /// Follows the API's "next" cursor URL to fetch the next page.
+    /// Using the cursor avoids duplicates if new articles are published between requests.
+    func fetchNextPage(url: String) async throws -> ArticlePageResult
 
     /// Fetch a single article by its unique identifier.
     func fetchArticle(id: Int) async throws -> Article

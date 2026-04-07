@@ -1,7 +1,5 @@
 // Data/Repositories/ArticleRepositoryImpl.swift
-// Concrete implementation of the ArticleRepository protocol (defined in Domain).
-// Only this file knows about APIClient, DTOs, and ArticleMapper —
-// Domain and Presentation never import anything from Data directly.
+// Concrete implementation of ArticleRepository (Domain protocol).
 
 import Foundation
 
@@ -15,12 +13,32 @@ final class ArticleRepositoryImpl: ArticleRepository {
 
     // MARK: - ArticleRepository
 
-    func fetchArticles(search: String?, limit: Int, offset: Int) async throws -> [Article] {
+    func fetchArticles(search: String?, limit: Int) async throws -> ArticlePageResult {
         do {
             let response: ArticleListDTO = try await apiClient.fetch(
-                .articles(search: search, limit: limit, offset: offset)
+                .articles(search: search, limit: limit)
             )
-            return ArticleMapper.toDomain(response.results)
+            return ArticlePageResult(
+                articles: ArticleMapper.toDomain(response.results),
+                nextPageURL: response.next
+            )
+        } catch let error as AppError {
+            throw error
+        } catch {
+            throw AppError.unknown(error)
+        }
+    }
+
+    func fetchNextPage(url: String) async throws -> ArticlePageResult {
+        guard let pageURL = URL(string: url) else {
+            throw AppError.invalidEndpoint
+        }
+        do {
+            let response: ArticleListDTO = try await apiClient.fetch(.nextPage(url: pageURL))
+            return ArticlePageResult(
+                articles: ArticleMapper.toDomain(response.results),
+                nextPageURL: response.next
+            )
         } catch let error as AppError {
             throw error
         } catch {

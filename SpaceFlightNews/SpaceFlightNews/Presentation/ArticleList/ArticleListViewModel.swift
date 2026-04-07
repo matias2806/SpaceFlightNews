@@ -1,11 +1,13 @@
 // Presentation/ArticleList/ArticleListViewModel.swift
-// Search is client-side, filtering allArticles by title.
-// Rationale: title-only matching is exact and instant (no network round-trip).
-// Pagination continues to load pages from the API without any search param.
+// Pagination uses the API's "next" cursor URL — avoids duplicates
+// if new articles are published between page requests.
 //
-// currentTask is internal (not private) so unit tests can
-// `await viewModel.currentTask?.value` for deterministic assertions
-// instead of using fragile Task.yield() or arbitrary sleeps.
+// isLoadingNextPage replaces the (buggy) `currentTask == nil` guard:
+// a completed Task is neither nil nor cancelled, which caused the
+// second page to never trigger. A plain Bool is unambiguous.
+//
+// currentTask remains internal for test determinism:
+// `await viewModel.currentTask?.value` gives a clean await point.
 
 import Foundation
 import Observation
@@ -17,6 +19,8 @@ final class ArticleListViewModel {
     // MARK: - Observable state
 
     private(set) var state: ViewState<[Article]> = .idle
+    private(set) var isLoadingNextPage = false
+    private(set) var hasNextPage = false
 
     // MARK: - Internal (test access)
 
@@ -27,9 +31,8 @@ final class ArticleListViewModel {
     private let fetchArticlesUseCase: any FetchArticlesUseCaseProtocol
 
     private var allArticles: [Article] = []
-    private var currentOffset = 0
-    private var canLoadMore = true
-    private(set) var searchQuery = ""   // internal for tests
+    private var nextPageURL: String?       // API cursor — nil means last page
+    private(set) var searchQuery = ""      // internal for tests
 
     private let pageSize = 20
 
@@ -41,14 +44,12 @@ final class ArticleListViewModel {
 
     // MARK: - Public interface
 
-    /// Call from View.onAppear — loads first page only if not already started.
     func onAppear() {
         guard case .idle = state else { return }
-        scheduleLoad()
+        scheduleFirstPage()
     }
 
-    /// Client-side title filter — instant, no network call, no debounce needed.
-    /// Pagination is unaffected: new pages still load in the background.
+    /// Client-side title filter — instant, no network call.
     func search(_ query: String) {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
         guard trimmed != searchQuery else { return }
@@ -56,35 +57,37 @@ final class ArticleListViewModel {
         applyFilter()
     }
 
-    /// Called when the last visible row appears — triggers next page load.
-    /// Only active when search is empty (filtering a subset doesn't need more pages).
+    /// Triggers next page when the last visible article appears.
     func loadNextPageIfNeeded(currentArticle: Article) {
-        guard searchQuery.isEmpty,
-              canLoadMore,
+        guard searchQuery.isEmpty,          // client-side filter: no more pages needed
+              hasNextPage,
+              !isLoadingNextPage,           // ← the actual fix: plain Bool, unambiguous
               case .success(let articles) = state,
-              articles.last?.id == currentArticle.id,
-              currentTask == nil || currentTask?.isCancelled == true else { return }
-        scheduleLoad()
+              articles.last?.id == currentArticle.id else { return }
+        scheduleNextPage()
     }
 
-    /// Resets everything and reloads from scratch.
     func retry() {
         allArticles = []
-        currentOffset = 0
-        canLoadMore = true
+        nextPageURL = nil
+        hasNextPage = false
         searchQuery = ""
         state = .idle
-        scheduleLoad()
+        scheduleFirstPage()
     }
 
-    // MARK: - Private helpers
+    // MARK: - Private
 
-    private func scheduleLoad() {
+    private func scheduleFirstPage() {
         currentTask?.cancel()
-        currentTask = Task { await fetchPage() }
+        currentTask = Task { await fetchPage(nextPageURL: nil) }
     }
 
-    /// Applies the current searchQuery to allArticles and updates state.
+    private func scheduleNextPage() {
+        currentTask?.cancel()
+        currentTask = Task { await fetchPage(nextPageURL: nextPageURL) }
+    }
+
     private func applyFilter() {
         if searchQuery.isEmpty {
             state = allArticles.isEmpty ? .idle : .success(allArticles)
@@ -96,24 +99,28 @@ final class ArticleListViewModel {
         }
     }
 
-    private func fetchPage() async {
+    private func fetchPage(nextPageURL cursorURL: String?) async {
         guard !Task.isCancelled else { return }
 
         if allArticles.isEmpty { state = .loading }
+        isLoadingNextPage = true
+        defer {
+            isLoadingNextPage = false
+            currentTask = nil     // reset so next trigger can fire
+        }
 
         do {
-            // No search param — filtering is client-side by title.
-            let page = try await fetchArticlesUseCase.execute(
-                search: nil,
-                limit: pageSize,
-                offset: currentOffset
+            let result = try await fetchArticlesUseCase.execute(
+                nextPageURL: cursorURL,
+                search: nil,        // search is client-side
+                limit: pageSize
             )
 
             guard !Task.isCancelled else { return }
 
-            allArticles += page
-            canLoadMore = page.count == pageSize
-            currentOffset += page.count
+            allArticles += result.articles
+            nextPageURL = result.nextPageURL
+            hasNextPage = result.nextPageURL != nil
             applyFilter()
 
         } catch let error as AppError {

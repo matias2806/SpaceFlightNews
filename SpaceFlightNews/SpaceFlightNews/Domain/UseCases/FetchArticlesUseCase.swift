@@ -1,11 +1,17 @@
 // Domain/UseCases/FetchArticlesUseCase.swift
-// Encapsulates the "fetch paginated articles with optional search" operation.
-// The protocol enables mock injection in unit tests without hitting the network.
+// Decides whether to start fresh (offset 0) or follow the API cursor (nextPageURL).
+// Centralising this decision here keeps the ViewModel unaware of URL details.
 
 import Foundation
 
 protocol FetchArticlesUseCaseProtocol: Sendable {
-    func execute(search: String?, limit: Int, offset: Int) async throws -> [Article]
+    /// - Parameters:
+    ///   - nextPageURL: Pass nil for the first page; pass the previous result's
+    ///     nextPageURL for subsequent pages. When non-nil, `search` and `limit`
+    ///     are ignored — the cursor URL already encodes them.
+    ///   - search: Optional title filter (used only on the first page call).
+    ///   - limit: Page size (used only when nextPageURL is nil).
+    func execute(nextPageURL: String?, search: String?, limit: Int) async throws -> ArticlePageResult
 }
 
 final class FetchArticlesUseCase: FetchArticlesUseCaseProtocol {
@@ -16,7 +22,11 @@ final class FetchArticlesUseCase: FetchArticlesUseCaseProtocol {
         self.repository = repository
     }
 
-    func execute(search: String?, limit: Int, offset: Int) async throws -> [Article] {
-        try await repository.fetchArticles(search: search, limit: limit, offset: offset)
+    func execute(nextPageURL: String?, search: String?, limit: Int) async throws -> ArticlePageResult {
+        if let nextPageURL {
+            return try await repository.fetchNextPage(url: nextPageURL)
+        } else {
+            return try await repository.fetchArticles(search: search, limit: limit)
+        }
     }
 }

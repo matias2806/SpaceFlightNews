@@ -1,7 +1,7 @@
 // Presentation/ArticleList/ArticleListView.swift
-// Main screen: search bar + paginated list.
-// .searchable is attached to the List (not to the NavigationStack root)
-// so it does NOT propagate to pushed views (ArticleDetailView).
+// Title is a fixed Text inside the view — never scrolls away.
+// Nav bar is empty (.navigationTitle("")) so no large/inline title
+// collapsing issues. .searchable persists across all states.
 
 import SwiftUI
 
@@ -13,8 +13,26 @@ struct ArticleListView: View {
 
     var body: some View {
         NavigationStack {
-            stateContent
-                .navigationTitle("Space News")
+            VStack(spacing: 0) {
+                // Title anchored 15pt from the top safe area edge.
+                // .ignoresSafeArea(.keyboard) prevents the keyboard from
+                // pushing the VStack up and shifting the title position.
+                Text("Space Flight News")
+                    .font(.title.bold())
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 15)
+                    .padding(.bottom, 10)
+
+                stateContent
+            }
+            .ignoresSafeArea(.keyboard)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $searchText, prompt: "Buscar por título")
+            .onChange(of: searchText) { _, query in
+                viewModel.search(query)
+            }
         }
         .onAppear {
             viewModel.onAppear()
@@ -53,7 +71,7 @@ struct ArticleListView: View {
                 }
             }
 
-            if canLoadMore {
+            if viewModel.isLoadingNextPage {
                 HStack {
                     Spacer()
                     ProgressView()
@@ -66,19 +84,6 @@ struct ArticleListView: View {
         .navigationDestination(for: Article.self) { article in
             ArticleDetailView(viewModel: makeDetailViewModel(article))
         }
-        // .searchable on the List — scoped to this view only,
-        // does not appear on ArticleDetailView when pushed.
-        .searchable(text: $searchText, prompt: "Buscar por título")
-        .onChange(of: searchText) { _, query in
-            viewModel.search(query)
-        }
-    }
-
-    // MARK: - Helpers
-
-    private var canLoadMore: Bool {
-        guard case .success = viewModel.state else { return false }
-        return viewModel.currentTask != nil
     }
 
     // MARK: - Empty state
