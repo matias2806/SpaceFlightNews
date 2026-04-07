@@ -1,6 +1,15 @@
 // Domain/Models/Article.swift
-// Core business entity. Immutable, type-safe, no Decodable dependency.
+// Core business entity. Immutable, type-safe, zero external dependencies.
+// No Decodable — that's Data layer responsibility.
 
 import Foundation
 
-// TODO: implement in feat: domain layer commit
+struct Article: Identifiable, Equatable, Sendable {
+    let id: Int
+    let title: String
+    let articleURL: URL
+    let imageURL: URL?
+    let newsSite: String
+    let summary: String
+    let publishedAt: Date
+}

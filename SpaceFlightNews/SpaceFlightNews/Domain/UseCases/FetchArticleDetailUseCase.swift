@@ -1,7 +1,22 @@
 // Domain/UseCases/FetchArticleDetailUseCase.swift
-// Encapsulates: fetch a single article by ID.
-// Depends on ArticleRepository protocol — testable in isolation.
+// Encapsulates the "fetch single article by ID" operation.
+// The protocol enables mock injection in unit tests without hitting the network.
 
 import Foundation
 
-// TODO: implement in feat: domain layer commit
+protocol FetchArticleDetailUseCaseProtocol: Sendable {
+    func execute(id: Int) async throws -> Article
+}
+
+final class FetchArticleDetailUseCase: FetchArticleDetailUseCaseProtocol {
+
+    private let repository: any ArticleRepository
+
+    init(repository: some ArticleRepository) {
+        self.repository = repository
+    }
+
+    func execute(id: Int) async throws -> Article {
+        try await repository.fetchArticle(id: id)
+    }
+}
