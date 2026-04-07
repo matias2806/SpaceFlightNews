@@ -1,6 +1,15 @@
 // Presentation/ArticleDetail/ArticleDetailView.swift
-// Detail screen: full article info, image, summary, link to original.
+// TODO: full implementation in feat: article detail screen commit.
 
 import SwiftUI
 
-// TODO: implement in feat: article detail screen commit
+struct ArticleDetailView: View {
+
+    let article: Article
+
+    var body: some View {
+        Text(article.title)
+            .navigationTitle("Detalle")
+            .navigationBarTitleDisplayMode(.inline)
+    }
+}

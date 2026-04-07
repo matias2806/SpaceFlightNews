@@ -1,6 +1,12 @@
 // Presentation/Common/LoadingView.swift
-// Centralized loading indicator. Swap between ProgressView and skeleton here.
+// Centralised loading indicator. Swap ProgressView for a skeleton here
+// without touching any screen.
 
 import SwiftUI
 
-// TODO: implement in feat: article list screen commit
+struct LoadingView: View {
+    var body: some View {
+        ProgressView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
