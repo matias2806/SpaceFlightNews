@@ -85,6 +85,7 @@ final class FetchArticlesUseCaseTests: XCTestCase {
             _ = try await sut.execute(nextPageURL: nil, search: nil, limit: 20)
             XCTFail("Expected error to be thrown")
         } catch let error as AppError {
+            // Status code is preserved for logging — UI never renders it
             XCTAssertEqual(error, .serverError(statusCode: 500))
         } catch {
             XCTFail("Expected AppError, got \(error)")

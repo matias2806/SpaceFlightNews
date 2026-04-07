@@ -35,7 +35,7 @@ enum ArticleMapper {
         // so "bad url" → "bad%20url" (no scheme). Require http/https explicitly.
         guard let articleURL = URL(string: dto.url),
               articleURL.scheme == "http" || articleURL.scheme == "https" else {
-            throw AppError.mappingFailed("Invalid article URL: \(dto.url)")
+            throw AppError.dataCorrupted
         }
 
         return Article(
@@ -62,9 +62,7 @@ enum ArticleMapper {
             do {
                 return try toDomain(dto)
             } catch {
-                AppLogger.networkError(
-                    AppError.mappingFailed("Skipping article id=\(dto.id): \(error)")
-                )
+                AppLogger.debug("Skipping article id=\(dto.id) — invalid URL")
                 return nil
             }
         }

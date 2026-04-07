@@ -80,6 +80,16 @@ final class ArticleListViewModel {
         state = .idle
         scheduleFirstPage()
     }
+
+    /// Pull-to-refresh: re-fetches from page 1 preserving the active search query.
+    /// Returns only after the fetch completes so the refresh spinner dismisses correctly.
+    func refresh() async {
+        allArticles = []
+        nextPageURL = nil
+        hasNextPage = false
+        scheduleFirstPage()
+        await currentTask?.value
+    }
     
     // MARK: - Private
     
@@ -142,9 +152,8 @@ final class ArticleListViewModel {
 
         } catch {
             guard !Task.isCancelled else { return }
-            let appError = AppError.unknown(error)
-            AppLogger.uiError(appError, context: "ArticleListViewModel")
-            if allArticles.isEmpty { state = .error(appError) }
+            AppLogger.uiError(.unknown, context: "ArticleListViewModel")
+            if allArticles.isEmpty { state = .error(.unknown) }
         }
     }
 }

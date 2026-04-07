@@ -30,7 +30,7 @@ final class URLSessionAPIClient: APIClientProtocol {
         do {
             request = try endpoint.urlRequest()
         } catch {
-            throw error as? AppError ?? AppError.invalidEndpoint
+            throw AppError.unknown
         }
 
         AppLogger.networkInfo("→ \(request.httpMethod ?? "GET") \(request.url?.absoluteString ?? "")")
@@ -47,7 +47,7 @@ final class URLSessionAPIClient: APIClientProtocol {
         }
 
         guard let http = response as? HTTPURLResponse else {
-            throw AppError.invalidResponse
+            throw AppError.unknown
         }
 
         AppLogger.networkInfo("← HTTP \(http.statusCode) (\(data.count) bytes)")
@@ -61,9 +61,8 @@ final class URLSessionAPIClient: APIClientProtocol {
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
-            let appError = AppError.decodingFailed(error)
-            AppLogger.networkError(appError)
-            throw appError
+            AppLogger.networkError(.dataCorrupted)
+            throw AppError.dataCorrupted
         }
     }
 
@@ -76,7 +75,7 @@ final class URLSessionAPIClient: APIClientProtocol {
              .dataNotAllowed:
             return .networkUnavailable
         default:
-            return .unknown(error)
+            return .unknown
         }
     }
 }

@@ -13,10 +13,7 @@ struct ArticleListView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // Title anchored 15pt from the top safe area edge.
-                // .ignoresSafeArea(.keyboard) prevents the keyboard from
-                // pushing the VStack up and shifting the title position.
+            VStack {
                 Text("Space Flight News")
                     .font(.title.bold())
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -51,7 +48,12 @@ struct ArticleListView: View {
             articleList(articles)
 
         case .empty:
-            emptyView
+            // Distinguish: API returned nothing vs search found nothing
+            if viewModel.searchQuery.isEmpty {
+                noContentView
+            } else {
+                searchEmptyView
+            }
 
         case .error(let error):
             ErrorView(error: error, onRetry: viewModel.retry)
@@ -81,14 +83,36 @@ struct ArticleListView: View {
             }
         }
         .listStyle(.plain)
+        .refreshable { await viewModel.refresh() }
         .navigationDestination(for: Article.self) { article in
             ArticleDetailView(viewModel: makeDetailViewModel(article))
         }
     }
 
-    // MARK: - Empty state
+    // MARK: - Empty states
 
-    private var emptyView: some View {
+    /// API returned no articles — pull to retry.
+    private var noContentView: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                Image(systemName: "newspaper")
+                    .font(.system(size: 52))
+                    .foregroundStyle(.secondary)
+                Text("No hay noticias publicadas")
+                    .font(.headline)
+                Text("Por favor, vuelve a intentarlo")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(32)
+            .frame(maxWidth: .infinity, minHeight: 300)
+        }
+        .refreshable { await viewModel.refresh() }
+    }
+
+    /// Search query returned no matches.
+    private var searchEmptyView: some View {
         VStack(spacing: 16) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 48))

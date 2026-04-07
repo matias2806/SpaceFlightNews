@@ -37,8 +37,9 @@ struct ErrorView: View {
     private var iconName: String {
         switch error {
         case .networkUnavailable: "wifi.exclamationmark"
-        case .serverError:        "server.rack"
-        default:                  "exclamationmark.triangle"
+        case .serverError:        "exclamationmark.triangle"
+        case .dataCorrupted:      "exclamationmark.triangle"
+        case .unknown:            "exclamationmark.triangle"
         }
     }
 }

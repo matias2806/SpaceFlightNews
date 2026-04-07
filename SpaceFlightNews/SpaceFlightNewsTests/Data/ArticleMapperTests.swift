@@ -29,14 +29,11 @@ final class ArticleMapperTests: XCTestCase {
         XCTAssertEqual(article.summary, "Humans will go to Mars.")
     }
 
-    func test_toDomain_invalidArticleURL_throwsMappingFailed() {
+    func test_toDomain_invalidArticleURL_throwsDataCorrupted() {
         let dto = ArticleDTO.stub(url: "not a valid url ://")
 
         XCTAssertThrowsError(try ArticleMapper.toDomain(dto)) { error in
-            guard let appError = error as? AppError,
-                  case .mappingFailed = appError else {
-                return XCTFail("Expected AppError.mappingFailed, got \(error)")
-            }
+            XCTAssertEqual(error as? AppError, .dataCorrupted)
         }
     }
 

@@ -25,7 +25,7 @@ final class ArticleRepositoryImpl: ArticleRepository {
         } catch let error as AppError {
             throw error
         } catch {
-            throw AppError.unknown(error)
+            throw AppError.unknown
         }
     }
 
@@ -42,7 +42,7 @@ final class ArticleRepositoryImpl: ArticleRepository {
         } catch let error as AppError {
             throw error
         } catch {
-            throw AppError.unknown(error)
+            throw AppError.unknown
         }
     }
 
@@ -53,7 +53,7 @@ final class ArticleRepositoryImpl: ArticleRepository {
         } catch let error as AppError {
             throw error
         } catch {
-            throw AppError.unknown(error)
+            throw AppError.unknown
         }
     }
 }
