@@ -10,7 +10,4 @@ protocol ArticleRepository: Sendable {
     /// Follows the API's "next" cursor URL to fetch the next page.
     /// Using the cursor avoids duplicates if new articles are published between requests.
     func fetchNextPage(url: String) async throws -> ArticlePageResult
-
-    /// Fetch a single article by its unique identifier.
-    func fetchArticle(id: Int) async throws -> Article
 }

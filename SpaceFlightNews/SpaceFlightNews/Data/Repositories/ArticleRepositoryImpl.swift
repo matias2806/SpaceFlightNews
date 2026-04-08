@@ -22,10 +22,8 @@ final class ArticleRepositoryImpl: ArticleRepository {
                 articles: ArticleMapper.toDomain(response.results),
                 nextPageURL: response.next
             )
-        } catch let error as AppError {
-            throw error
         } catch {
-            throw AppError.unknown
+            throw (error as? AppError) ?? .unknown
         }
     }
 
@@ -39,21 +37,8 @@ final class ArticleRepositoryImpl: ArticleRepository {
                 articles: ArticleMapper.toDomain(response.results),
                 nextPageURL: response.next
             )
-        } catch let error as AppError {
-            throw error
         } catch {
-            throw AppError.unknown
-        }
-    }
-
-    func fetchArticle(id: Int) async throws -> Article {
-        do {
-            let dto: ArticleDTO = try await apiClient.fetch(.articleDetail(id: id))
-            return try ArticleMapper.toDomain(dto)
-        } catch let error as AppError {
-            throw error
-        } catch {
-            throw AppError.unknown
+            throw (error as? AppError) ?? .unknown
         }
     }
 }

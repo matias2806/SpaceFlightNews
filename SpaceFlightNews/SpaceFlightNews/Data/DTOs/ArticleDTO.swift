@@ -5,11 +5,6 @@
 
 import Foundation
 
-/// Single article as returned by /v4/articles/{id} and inside /v4/articles results.
-// Sendable conformance is implicit (struct with all-Sendable members).
-// Explicit Sendable causes a compiler error with SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor
-// because the synthesized Decodable init becomes @MainActor-isolated and can't satisfy
-// a Sendable type-parameter constraint.
 struct ArticleDTO: Decodable {
     let id: Int
     let title: String
@@ -17,7 +12,7 @@ struct ArticleDTO: Decodable {
     let imageUrl: String?
     let newsSite: String
     let summary: String
-    let publishedAt: String   // ISO8601 string — mapper converts to Date
+    let publishedAt: String
     let updatedAt: String
 
     enum CodingKeys: String, CodingKey {
