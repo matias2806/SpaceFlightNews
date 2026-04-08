@@ -22,6 +22,9 @@ struct ArticleDetailView: View {
                 contentSection
             }
         }
+        // Re-enable the nav bar so the back button appears (the list view hides
+        // it to fix the pull-to-refresh content-inset issue).
+        .toolbar(.visible, for: .navigationBar)
         .navigationTitle(viewModel.article.newsSite)
         .navigationBarTitleDisplayMode(.inline)
     }

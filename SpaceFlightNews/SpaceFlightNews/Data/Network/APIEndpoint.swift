@@ -28,11 +28,11 @@ enum APIEndpoint {
                 url: Self.baseURL.appendingPathComponent(path),
                 resolvingAgainstBaseURL: false
             ) else {
-                throw AppError.invalidEndpoint
+                throw AppError.unknown
             }
             let items = queryItems
             if !items.isEmpty { components.queryItems = items }
-            guard let url = components.url else { throw AppError.invalidEndpoint }
+            guard let url = components.url else { throw AppError.unknown }
             return Self.baseRequest(for: url)
         }
     }

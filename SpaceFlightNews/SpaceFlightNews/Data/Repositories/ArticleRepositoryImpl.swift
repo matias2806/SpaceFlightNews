@@ -31,7 +31,7 @@ final class ArticleRepositoryImpl: ArticleRepository {
 
     func fetchNextPage(url: String) async throws -> ArticlePageResult {
         guard let pageURL = URL(string: url) else {
-            throw AppError.invalidEndpoint
+            throw AppError.unknown
         }
         do {
             let response: ArticleListDTO = try await apiClient.fetch(.nextPage(url: pageURL))

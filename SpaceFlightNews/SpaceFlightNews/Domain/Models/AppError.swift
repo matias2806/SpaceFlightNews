@@ -46,4 +46,3 @@ enum AppError: Error, LocalizedError, CustomDebugStringConvertible, Equatable {
         }
     }
 }
-// Equatable is synthesized automatically — no manual == needed.

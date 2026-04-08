@@ -81,14 +81,15 @@ final class ArticleListViewModel {
         scheduleFirstPage()
     }
 
-    /// Pull-to-refresh: re-fetches from page 1 preserving the active search query.
-    /// Returns only after the fetch completes so the refresh spinner dismisses correctly.
+    /// Pull-to-refresh: cancels any in-flight task, resets pagination and re-fetches
+    /// page 1. Calls fetchPage directly so the system refresh spinner stays alive
+    /// for exactly as long as the network request takes — no Task intermediary.
     func refresh() async {
-        allArticles = []
+        currentTask?.cancel()
+        currentTask = nil
         nextPageURL = nil
         hasNextPage = false
-        scheduleFirstPage()
-        await currentTask?.value
+        await fetchPage(nextPageURL: nil)
     }
     
     // MARK: - Private
@@ -138,7 +139,13 @@ final class ArticleListViewModel {
 
             guard !Task.isCancelled else { return }
 
-            allArticles += result.articles
+            // First page (initial load / retry / refresh): replace.
+            // Next page (pagination): append.
+            if cursorURL == nil {
+                allArticles = result.articles
+            } else {
+                allArticles += result.articles
+            }
             nextPageURL = result.nextPageURL
             hasNextPage = result.nextPageURL != nil
             applyFilter()
