@@ -14,11 +14,19 @@
 			remoteGlobalIDString = 0A2C8CED2F847C6F005FE23E;
 			remoteInfo = SpaceFlightNews;
 		};
+		0ACB9EEB2F871FE700294A4E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0A2C8CE62F847C6F005FE23E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0A2C8CED2F847C6F005FE23E;
+			remoteInfo = SpaceFlightNews;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0A2C8CEE2F847C6F005FE23E /* SpaceFlightNews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpaceFlightNews.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A2C8E172F85931F005FE23E /* SpaceFlightNewsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpaceFlightNewsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0ACB9EE52F871FE700294A4E /* SpaceFlightNewsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpaceFlightNewsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -30,6 +38,11 @@
 		0A2C8E182F859320005FE23E /* SpaceFlightNewsTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = SpaceFlightNewsTests;
+			sourceTree = "<group>";
+		};
+		0ACB9EE62F871FE700294A4E /* SpaceFlightNewsUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SpaceFlightNewsUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -49,6 +62,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0ACB9EE22F871FE700294A4E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -57,6 +77,7 @@
 			children = (
 				0A2C8CF02F847C6F005FE23E /* SpaceFlightNews */,
 				0A2C8E182F859320005FE23E /* SpaceFlightNewsTests */,
+				0ACB9EE62F871FE700294A4E /* SpaceFlightNewsUITests */,
 				0A2C8CEF2F847C6F005FE23E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -66,6 +87,7 @@
 			children = (
 				0A2C8CEE2F847C6F005FE23E /* SpaceFlightNews.app */,
 				0A2C8E172F85931F005FE23E /* SpaceFlightNewsTests.xctest */,
+				0ACB9EE52F871FE700294A4E /* SpaceFlightNewsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -118,6 +140,29 @@
 			productReference = 0A2C8E172F85931F005FE23E /* SpaceFlightNewsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		0ACB9EE42F871FE700294A4E /* SpaceFlightNewsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0ACB9EEF2F871FE700294A4E /* Build configuration list for PBXNativeTarget "SpaceFlightNewsUITests" */;
+			buildPhases = (
+				0ACB9EE12F871FE700294A4E /* Sources */,
+				0ACB9EE22F871FE700294A4E /* Frameworks */,
+				0ACB9EE32F871FE700294A4E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0ACB9EEC2F871FE700294A4E /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				0ACB9EE62F871FE700294A4E /* SpaceFlightNewsUITests */,
+			);
+			name = SpaceFlightNewsUITests;
+			packageProductDependencies = (
+			);
+			productName = SpaceFlightNewsUITests;
+			productReference = 0ACB9EE52F871FE700294A4E /* SpaceFlightNewsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -132,6 +177,10 @@
 						CreatedOnToolsVersion = 26.2;
 					};
 					0A2C8E162F85931F005FE23E = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 0A2C8CED2F847C6F005FE23E;
+					};
+					0ACB9EE42F871FE700294A4E = {
 						CreatedOnToolsVersion = 26.2;
 						TestTargetID = 0A2C8CED2F847C6F005FE23E;
 					};
@@ -153,6 +202,7 @@
 			targets = (
 				0A2C8CED2F847C6F005FE23E /* SpaceFlightNews */,
 				0A2C8E162F85931F005FE23E /* SpaceFlightNewsTests */,
+				0ACB9EE42F871FE700294A4E /* SpaceFlightNewsUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -166,6 +216,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		0A2C8E152F85931F005FE23E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0ACB9EE32F871FE700294A4E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -189,6 +246,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0ACB9EE12F871FE700294A4E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -196,6 +260,11 @@
 			isa = PBXTargetDependency;
 			target = 0A2C8CED2F847C6F005FE23E /* SpaceFlightNews */;
 			targetProxy = 0A2C8E1B2F859320005FE23E /* PBXContainerItemProxy */;
+		};
+		0ACB9EEC2F871FE700294A4E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0A2C8CED2F847C6F005FE23E /* SpaceFlightNews */;
+			targetProxy = 0ACB9EEB2F871FE700294A4E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -455,6 +524,51 @@
 			};
 			name = Release;
 		};
+		0ACB9EED2F871FE700294A4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KZTT35S889;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.palmieri.SpaceFlightNewsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SpaceFlightNews;
+			};
+			name = Debug;
+		};
+		0ACB9EEE2F871FE700294A4E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KZTT35S889;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.palmieri.SpaceFlightNewsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SpaceFlightNews;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -481,6 +595,15 @@
 			buildConfigurations = (
 				0A2C8E1E2F859320005FE23E /* Debug */,
 				0A2C8E1F2F859320005FE23E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0ACB9EEF2F871FE700294A4E /* Build configuration list for PBXNativeTarget "SpaceFlightNewsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0ACB9EED2F871FE700294A4E /* Debug */,
+				0ACB9EEE2F871FE700294A4E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

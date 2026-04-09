@@ -22,12 +22,9 @@ final class ArticleListViewModelTests: XCTestCase {
     }
 
     override func tearDown() {
-        // Cancelar cualquier task en curso ANTES de liberar
         sut?.currentTask?.cancel()
-
         sut = nil
         mockUseCase = nil
-
         super.tearDown()
     }
 
@@ -89,6 +86,17 @@ final class ArticleListViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state, .error(.serverError(statusCode: 503)))
     }
 
+    func test_onAppear_nonAppError_mapsToUnknown() async {
+        // Tests the generic `catch { .unknown }` branch — thrown when a non-AppError
+        // escapes the use case (e.g. an unexpected system error).
+        mockUseCase.stubbedError = NSError(domain: "test", code: -1)
+
+        sut.onAppear()
+        await sut.currentTask?.value
+
+        XCTAssertEqual(sut.state, .error(.unknown))
+    }
+
     // MARK: - Retry
 
     func test_retry_afterError_resetsAndReloads() async {
@@ -124,6 +132,31 @@ final class ArticleListViewModelTests: XCTestCase {
         await sut.currentTask?.value
 
         XCTAssertEqual(sut.searchQuery, "")
+    }
+
+    // MARK: - Refresh
+
+    func test_refresh_replacesArticles() async {
+        // Load page 1 (2 articles) + page 2 (2 more) → 4 total
+        let page1 = [Article.stub(id: 1), Article.stub(id: 2)]
+        mockUseCase.stubbedResult = ArticlePageResult(articles: page1, nextPageURL: "next")
+        sut.onAppear()
+        await sut.currentTask?.value
+
+        mockUseCase.stubbedResult = ArticlePageResult(
+            articles: [.stub(id: 3), .stub(id: 4)],
+            nextPageURL: nil
+        )
+        sut.loadNextPageIfNeeded(currentArticle: page1.last!)
+        await sut.currentTask?.value
+
+        // Refresh: should discard all accumulated articles and return to 1 fresh page
+        let refreshed = [Article.stub(id: 5), Article.stub(id: 6)]
+        mockUseCase.stubbedResult = ArticlePageResult(articles: refreshed, nextPageURL: nil)
+        await sut.refresh()
+
+        XCTAssertEqual(sut.state, .success(refreshed))
+        XCTAssertFalse(sut.hasNextPage)
     }
 
     // MARK: - Search
@@ -194,6 +227,20 @@ final class ArticleListViewModelTests: XCTestCase {
         XCTAssertEqual(sut.state, .success(articles))
     }
 
+    func test_search_whitespaceOnly_treatedAsEmpty() async {
+        let articles = [Article.stub(id: 1), Article.stub(id: 2)]
+        mockUseCase.stubbedResult = ArticlePageResult(articles: articles, nextPageURL: nil)
+
+        sut.onAppear()
+        await sut.currentTask?.value
+
+        sut.search("   ")
+
+        // Whitespace-only query is trimmed to "" — full list must remain visible
+        XCTAssertEqual(sut.state, .success(articles))
+        XCTAssertEqual(sut.searchQuery, "")
+    }
+
     // MARK: - Pagination
 
     func test_hasNextPage_falseWhenAPIReturnsNilNextURL() async {
@@ -229,6 +276,37 @@ final class ArticleListViewModelTests: XCTestCase {
         await sut.currentTask?.value
 
         XCTAssertEqual(sut.state, .success(page1 + page2))
+    }
+
+    func test_loadNextPageIfNeeded_doesNotTrigger_whenSearchActive() async {
+        let articles = [Article.stub(id: 1), Article.stub(id: 2)]
+        mockUseCase.stubbedResult = ArticlePageResult(articles: articles, nextPageURL: "next")
+
+        sut.onAppear()
+        await sut.currentTask?.value
+
+        sut.search("spacex")
+        let callsBefore = mockUseCase.callCount
+
+        // With an active search query the guard `searchQuery.isEmpty` must block pagination
+        sut.loadNextPageIfNeeded(currentArticle: articles.last!)
+
+        XCTAssertEqual(mockUseCase.callCount, callsBefore)
+    }
+
+    func test_loadNextPageIfNeeded_doesNotTrigger_forNonLastArticle() async {
+        let articles = [Article.stub(id: 1), Article.stub(id: 2), Article.stub(id: 3)]
+        mockUseCase.stubbedResult = ArticlePageResult(articles: articles, nextPageURL: "next")
+
+        sut.onAppear()
+        await sut.currentTask?.value
+
+        let callsBefore = mockUseCase.callCount
+
+        // Passing a non-last article must not trigger the next page fetch
+        sut.loadNextPageIfNeeded(currentArticle: articles[0])
+
+        XCTAssertEqual(mockUseCase.callCount, callsBefore)
     }
 
     // MARK: - Loading state

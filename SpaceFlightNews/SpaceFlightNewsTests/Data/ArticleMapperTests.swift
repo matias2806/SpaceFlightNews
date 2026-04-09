@@ -69,7 +69,15 @@ final class ArticleMapperTests: XCTestCase {
     func test_toDomain_iso8601DateWithFractionalSeconds_parsesCorrectly() throws {
         let dto = ArticleDTO.stub(publishedAt: "2024-06-15T12:00:00.000Z")
         let article = try ArticleMapper.toDomain(dto)
-        XCTAssertNotEqual(article.publishedAt, .distantPast)
+
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let components = calendar.dateComponents([.year, .month, .day, .hour], from: article.publishedAt)
+
+        XCTAssertEqual(components.year, 2024)
+        XCTAssertEqual(components.month, 6)
+        XCTAssertEqual(components.day, 15)
+        XCTAssertEqual(components.hour, 12)
     }
 
     func test_toDomain_unparsableDate_fallsBackToDistantPast() throws {
@@ -101,5 +109,14 @@ final class ArticleMapperTests: XCTestCase {
     func test_toDomain_emptyList_returnsEmpty() {
         let articles = ArticleMapper.toDomain([])
         XCTAssertTrue(articles.isEmpty)
+    }
+
+    // MARK: - Performance
+
+    func test_performance_mapping100DTOs() {
+        let dtos = (0..<100).map { ArticleDTO.stub(id: $0) }
+        measure {
+            _ = ArticleMapper.toDomain(dtos)
+        }
     }
 }

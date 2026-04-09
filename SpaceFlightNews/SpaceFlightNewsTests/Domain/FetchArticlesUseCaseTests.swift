@@ -44,6 +44,18 @@ final class FetchArticlesUseCaseTests: XCTestCase {
         XCTAssertEqual(mockRepository.lastFetchNextPageURL, cursorURL)
     }
 
+    // MARK: - Parameter forwarding
+
+    func test_execute_passesSearchQueryToRepository() async throws {
+        _ = try await sut.execute(nextPageURL: nil, search: "spacex", limit: 20)
+        XCTAssertEqual(mockRepository.lastSearchQuery, "spacex")
+    }
+
+    func test_execute_passesLimitToRepository() async throws {
+        _ = try await sut.execute(nextPageURL: nil, search: nil, limit: 10)
+        XCTAssertEqual(mockRepository.lastLimit, 10)
+    }
+
     // MARK: - nextPageURL propagation
 
     func test_execute_returnsNextPageURLFromRepository() async throws {

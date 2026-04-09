@@ -18,12 +18,14 @@ final class MockArticleRepository: ArticleRepository, @unchecked Sendable {
     private(set) var fetchNextPageCallCount = 0
     private(set) var lastFetchNextPageURL: String?
     private(set) var lastSearchQuery: String?
+    private(set) var lastLimit: Int?
 
     // MARK: - ArticleRepository
 
     func fetchArticles(search: String?, limit: Int) async throws -> ArticlePageResult {
         fetchArticlesCallCount += 1
         lastSearchQuery = search
+        lastLimit = limit
         if let error = stubbedError { throw error }
         return stubbedPageResult
     }
