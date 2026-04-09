@@ -1,0 +1,36 @@
+/* Localizable.strings — base language (Spanish)
+   To add a new language: File → New → File → Strings File,
+   name it "Localizable", select the target, then add the language
+   from Project → Info → Localizations. Xcode creates the .lproj
+   folder automatically. Only the values change; keys stay the same. */
+
+/* ── App ── */
+"app.title" = "Space Flight News";
+
+/* ── Search ── */
+"search.prompt" = "Buscar por título";
+
+/* ── Article list — empty state (API returned 0 results) ── */
+"list.empty.title"    = "No hay noticias publicadas";
+"list.empty.subtitle" = "Por favor, vuelve a intentarlo";
+
+/* ── Article list — search returned 0 results ── */
+"search.empty.title"    = "Sin resultados";
+"search.empty.subtitle" = "No se encontraron artículos con ese título.";
+
+/* ── Article detail ── */
+"detail.readArticle" = "Leer artículo completo";
+
+/* ── Error view ── */
+"error.retry"    = "Reintentar";
+"error.fallback" = "Algo salió mal.";
+
+/* ── AppError — user-facing descriptions (no technical detail) ── */
+"error.network.description"      = "Sin conexión a internet.";
+"error.server.description"       = "Error del servidor. Intentá más tarde.";
+"error.dataCorrupted.description" = "No pudimos procesar la respuesta.";
+"error.unknown.description"      = "Algo salió mal. Intentá de nuevo.";
+
+/* ── AppError — recovery suggestions ── */
+"error.network.recovery" = "Verificá tu conexión y volvé a intentar.";
+"error.generic.recovery" = "Tocá Reintentar para cargar nuevamente.";

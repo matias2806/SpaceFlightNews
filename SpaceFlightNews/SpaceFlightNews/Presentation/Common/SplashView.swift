@@ -10,7 +10,7 @@ struct SplashView: View {
                 Image(systemName: "scope")
                     .font(.system(size: 72, weight: .thin))
                     .foregroundStyle(.primary)
-                Text("Space Flight News")
+                Text(translate("app.title"))
                     .font(.title2.bold())
                     .foregroundStyle(.primary)
             }

@@ -15,23 +15,17 @@ enum AppError: Error, LocalizedError, CustomDebugStringConvertible, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .networkUnavailable:
-            return "Sin conexión a internet."
-        case .serverError:
-            return "Error del servidor. Intentá más tarde."
-        case .dataCorrupted:
-            return "No pudimos procesar la respuesta."
-        case .unknown:
-            return "Algo salió mal. Intentá de nuevo."
+        case .networkUnavailable: return String(localized: "error.network.description")
+        case .serverError:        return String(localized: "error.server.description")
+        case .dataCorrupted:      return String(localized: "error.dataCorrupted.description")
+        case .unknown:            return String(localized: "error.unknown.description")
         }
     }
 
     var recoverySuggestion: String? {
         switch self {
-        case .networkUnavailable:
-            return "Verificá tu conexión y volvé a intentar."
-        default:
-            return "Tocá Reintentar para cargar nuevamente."
+        case .networkUnavailable: return String(localized: "error.network.recovery")
+        default:                  return String(localized: "error.generic.recovery")
         }
     }
 

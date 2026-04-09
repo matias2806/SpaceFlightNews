@@ -36,7 +36,7 @@ struct ArticleListView: View {
         NavigationStack {
             if shouldShowSearch {
                 mainContent
-                    .searchable(text: $searchText, prompt: "Buscar por título")
+                    .searchable(text: $searchText, prompt: translate("search.prompt"))
                     .onChange(of: searchText) { _, query in viewModel.search(query) }
                     .onChange(of: viewModel.searchQuery) { _, query in
                         if query.isEmpty { searchText = "" }
@@ -50,7 +50,7 @@ struct ArticleListView: View {
 
     private var mainContent: some View {
         VStack(spacing: 0) {
-            Text("Space Flight News")
+            Text(translate("app.title"))
                 .font(.title.bold())
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16)
@@ -59,8 +59,6 @@ struct ArticleListView: View {
 
             stateContent
         }
-        // Hiding the nav bar removes UIKit's automatic scroll-view content
-        // inset, so the List frame and the pull-to-refresh origin align.
         .toolbar(.hidden, for: .navigationBar)
         .navigationDestination(for: Article.self) { article in
             ArticleDetailView(viewModel: makeDetailViewModel(article))
@@ -124,9 +122,9 @@ struct ArticleListView: View {
                 Image(systemName: "newspaper")
                     .font(.system(size: 52))
                     .foregroundStyle(.secondary)
-                Text("No hay noticias publicadas")
+                Text(translate("list.empty.title"))
                     .font(.headline)
-                Text("Por favor, vuelve a intentarlo")
+                Text(translate("list.empty.subtitle"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -142,9 +140,9 @@ struct ArticleListView: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
-            Text("Sin resultados")
+            Text(translate("search.empty.title"))
                 .font(.headline)
-            Text("No se encontraron artículos con ese título.")
+            Text(translate("search.empty.subtitle"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

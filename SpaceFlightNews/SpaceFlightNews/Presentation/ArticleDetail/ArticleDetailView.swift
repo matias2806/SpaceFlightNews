@@ -69,12 +69,10 @@ struct ArticleDetailView: View {
 
     private var contentSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Title
             Text(viewModel.article.title)
                 .font(.title2.bold())
                 .fixedSize(horizontal: false, vertical: true)
 
-            // Meta row
             HStack {
                 Label(viewModel.article.newsSite, systemImage: "newspaper")
                 Spacer()
@@ -88,14 +86,12 @@ struct ArticleDetailView: View {
 
             Divider()
 
-            // Summary
             Text(viewModel.article.summary)
                 .font(.body)
                 .fixedSize(horizontal: false, vertical: true)
 
-            // External link
             Link(destination: viewModel.article.articleURL) {
-                Label("Leer artículo completo", systemImage: "safari")
+                Label(translate("detail.readArticle"), systemImage: "safari")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)

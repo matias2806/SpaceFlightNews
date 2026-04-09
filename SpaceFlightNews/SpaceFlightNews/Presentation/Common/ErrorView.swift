@@ -15,7 +15,7 @@ struct ErrorView: View {
                 .foregroundStyle(.secondary)
 
             VStack(spacing: 8) {
-                Text(error.errorDescription ?? "Algo salió mal.")
+                Text(error.errorDescription ?? String(localized: "error.fallback"))
                     .font(.headline)
                     .multilineTextAlignment(.center)
 
@@ -27,7 +27,7 @@ struct ErrorView: View {
                 }
             }
 
-            Button("Reintentar", action: onRetry)
+            Button(translate("error.retry"), action: onRetry)
                 .buttonStyle(.borderedProminent)
         }
         .padding(32)
