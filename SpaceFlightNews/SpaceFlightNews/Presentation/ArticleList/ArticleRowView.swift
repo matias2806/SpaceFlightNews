@@ -1,6 +1,10 @@
 // Presentation/ArticleList/ArticleRowView.swift
 // Single row: thumbnail + title + source + date.
 // dateFormatter is static to avoid reinstantiation per cell.
+//
+// Accessibility: the entire row is collapsed into one VoiceOver element
+// with a descriptive label — avoids four separate swipe targets
+// (image, title, site, date) for a single piece of content.
 
 import SwiftUI
 
@@ -34,6 +38,13 @@ struct ArticleRowView: View {
             }
         }
         .padding(.vertical, 4)
+        // Collapse all child elements into one VoiceOver target.
+        // Without this, VoiceOver reads the image, title, site, and date
+        // as four separate swipes for a single article.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(
+            "\(article.title), \(article.newsSite), \(Self.dateFormatter.string(from: article.publishedAt))"
+        )
     }
 
     private var thumbnail: some View {

@@ -96,6 +96,7 @@ struct ArticleDetailView: View {
             }
             .buttonStyle(.borderedProminent)
             .padding(.top, 8)
+            .accessibilityHint("Abre el artículo completo en Safari")
         }
         .padding(16)
     }
